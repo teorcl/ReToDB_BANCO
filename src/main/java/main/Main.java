@@ -3,6 +3,7 @@ package main;
 import integration.database.mysql.MySqlOperations;
 import org.apache.log4j.PropertyConfigurator;
 import java.sql.SQLException;
+import java.sql.SQLOutput;
 import java.util.Scanner;
 
 import static util.enums.Log4jValues.LOG4J_PROPERTIES_FILE_PATH;
@@ -31,34 +32,41 @@ public class Main {
             String opcion="";
 
             while (salir){
-                System.out.println("1. Mostrar la informacion de los clientes\n" +
-                                   "2. Mostrar la informacion de los empleados\n"+
-                                   "3. Listar solo los clientes que viven en Medellín\n"+
-                                   "4. Actualizar la direccion de un cliente\n"+
-                                   "5. Crear un nuevo cliente\n"+
-                                   "6. Mostrar los días trabajados por un empleado\n"+
-                                   "0. Salir");
+                mostrarMenu();
+                System.out.println();
+                System.out.println("=============================================================");
+                System.out.print("Digita la opcion que deseas realizar: ");
                 opcion = sc.nextLine();
                 opcion = validar(opcion);
 
                 switch (opcion){
                     case "1":
                         selectAllFromCliente();
+                        System.out.println();
                         break;
                     case "2":
                         selectAllFromEmpleado();
+                        System.out.println();
                         break;
                     case "3":
                         callSpClientesMedellin();
+                        System.out.println();
                         break;
                     case "4":
                         actualizarDatosCliente();
+                        System.out.println();
                         break;
                     case "5":
                         insertarNuevoCliente();
+                        System.out.println();
                         break;
                     case "6":
                         calcularDiasLaborados();
+                        System.out.println();
+                        break;
+                    case "7":
+                        eliminarCliente();
+                        System.out.println();
                         break;
                     case "0":
                         salir = false;
@@ -104,7 +112,6 @@ public class Main {
         String datosNuevoUsuario = "";
         datosNuevoUsuario = input.nextLine();
         datosNuevoUsuario = "call CREAR_CLIENTE("+datosNuevoUsuario+")";
-        //System.out.println(datosNuevoUsuario);
         mySqlOperations.setSqlStatement(datosNuevoUsuario);
         mySqlOperations.executeSqlStatement();
         mySqlOperations.printResultSet();
@@ -112,7 +119,9 @@ public class Main {
 
     private static void calcularDiasLaborados() throws SQLException {
         System.out.println("Ingrese los datos del empleado que desea saber los días labprados asi: \n"
-                + "'2019-09-12', 3");
+                + "'AAAA-MM-DD', ID_EMPLEADO");
+        System.out.println("DONDE AAAA-MM-DD ES LA FECHA DE INGRESO DEL EMPLEADO");
+        System.out.print("DATOS: ");
         String datosUsuario = "";
         datosUsuario = input.nextLine();
         datosUsuario = "call CALCULA_DIAS_LABORADOS("+ datosUsuario+")";
@@ -133,13 +142,24 @@ public class Main {
         mySqlOperations.printResultSet();
     }
 
+    private static void eliminarCliente() throws SQLException {
+        System.out.println("Ingrese el id del cliente que desea eliminar");
+        System.out.print("idCliente: ");
+        String datosUsuario = "";
+        datosUsuario = input.nextLine();
+        datosUsuario = "call ELIMINAR_CLIENTE("+ datosUsuario+")";
+        mySqlOperations.setSqlStatement(datosUsuario);
+        mySqlOperations.executeSqlStatement();
+        mySqlOperations.printResultSet();
+    }
+
     private static void logout(){
         mySqlOperations.close();
     }
 
     public static String validar(String opt){
         Scanner scanner = new Scanner(System.in);
-        String opt_valida="1,2,3,4,5,6,0";
+        String opt_valida="1,2,3,4,5,6,7,0";
         while(!opt_valida.contains(opt) || opt.equals(",") || opt.equals("")) {
             System.out.println("La opcion no valida!");
             System.out.print("opcion: ");
@@ -147,6 +167,20 @@ public class Main {
         }
         return opt;
 
+    }
+
+    /**Metodo para mostrar el menú**/
+    public static void mostrarMenu(){
+        System.out.println("=============================================================");
+        System.out.println();
+        System.out.println("       1. Mostrar la informacion de los clientes\n" +
+                "       2. Mostrar la informacion de los empleados\n"+
+                "       3. Listar solo los clientes que viven en Medellín\n"+
+                "       4. Actualizar la direccion de un cliente\n"+
+                "       5. Crear un nuevo cliente\n"+
+                "       6. Mostrar los días trabajados por un empleado\n"+
+                "       7. Eliminar un cliente\n"+
+                "       0. Salir");
     }
 
 }
